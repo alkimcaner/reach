@@ -1,59 +1,55 @@
 "use client";
 
 import {
-  Cloud,
   CreditCard,
   Github,
-  Keyboard,
   LifeBuoy,
   LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
   Settings,
   User,
-  UserPlus,
-  Users,
   Loader2,
-  Menu,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useMemo } from "react";
 
 export function ProfileDropdown() {
   const { data: session } = useSession();
+  const initials = useMemo(
+    () =>
+      session?.user?.name
+        ?.split(" ")
+        .reduce((prev, value) => prev + value[0], ""),
+    [session]
+  );
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          {session ? (
-            <span className="flex items-center gap-2">
-              <Menu size={16} /> {session.user?.name}
-            </span>
-          ) : (
-            <Loader2 className="animate-spin" />
-          )}
-        </Button>
+        {session ? (
+          <Avatar className="cursor-pointer">
+            {session.user?.image && (
+              <AvatarImage src={session.user?.image} alt="avatar" />
+            )}
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+        ) : (
+          <Loader2 className="animate-spin" />
+        )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+      <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuLabel>{session?.user?.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <Link href="/profile">
@@ -72,44 +68,6 @@ export function ProfileDropdown() {
               <span>Settings</span>
             </DropdownMenuItem>
           </Link>
-          <DropdownMenuItem>
-            <Keyboard className="mr-2 h-4 w-4" />
-            <span>Keyboard shortcuts</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Users className="mr-2 h-4 w-4" />
-            <span>Team</span>
-          </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <UserPlus className="mr-2 h-4 w-4" />
-              <span>Invite users</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>
-                  <Mail className="mr-2 h-4 w-4" />
-                  <span>Email</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  <span>Message</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  <span>More...</span>
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuItem>
-            <Plus className="mr-2 h-4 w-4" />
-            <span>New Team</span>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <a
